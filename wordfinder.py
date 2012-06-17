@@ -9,6 +9,7 @@ class WordFinder:
         self.__COUNT = "count"
         self.__LINENO = "lineno"
         self.__OCCURRED = "occurred"
+        self.__path = os.getcwd()
         self.__findmode = self.__LINENO
         self.__fullword = False
         self.__recursive = False
@@ -17,18 +18,20 @@ class WordFinder:
         self.__SetSuffixs("c,cpp,h,hpp,txt,xml,py,proto")
 
     def Find(self, line):
-        args = line.split()
-        if len(args) < 2:
-            self.PrintUsage()
-            return
-        path = args[0]
-        word = args[1]
-        self.__ParseOptions(args[2:])
-        if not os.path.exists(path):
+        word = ""
+        optionstart = line.find("-")
+        if optionstart == -1:
+            word = line
+        else:
+            word = line[0 : optionstart - 1]
+            args = line[optionstart : ].split()
+            self.__ParseOptions(args)
+
+        if not os.path.exists(self.__path):
             print("'" + path + "'" + " is not exists!")
             return
-        print(os.path.abspath(path))
-        path = os.path.normpath(os.path.abspath(path))
+        print(os.path.abspath(self.__path))
+        path = os.path.normpath(os.path.abspath(self.__path))
 
         filecount = 0
         wordcount = 0
@@ -121,10 +124,10 @@ class WordFinder:
             return path.endswith(self.__suffixs)
 
     def PrintUsage(self):
-        print("example input: path word [-s, -r, -m, --suffixs=]")
-        print("    path: target dir or file")
+        print("example input: word [-p, -m, --suffixs=]")
         print("    word: target word")
-        print("    -m: 1 for occurred, 2 for word count, 3 for line no")
+        print("    -p: target dir or file")
+        print("    -m: 1 for occurred, 2 for word count, 3 for line no(default)")
         print("    --store: if specified, the result will be stored in 'wordfinder.txt'")
         print("    --rec: if specified, program will search the subdir recursively")
         print("    --case: if specified, the word is case sensitive")
@@ -132,7 +135,7 @@ class WordFinder:
         print("    --suffixs: specified the target files's suffixs, such as 'c,cpp,xml'")
 
     def __ParseOptions(self, args):
-        options, _ = getopt.getopt(args, "m", ["rec", "store", "case", "full", "suffixs="])
+        options, _ = getopt.getopt(args, "p:m", ["rec", "store", "case", "full", "suffixs="])
         for name, value in options:
             if name == "-m":
                 if value == "1":
@@ -141,6 +144,8 @@ class WordFinder:
                     self.__findmode = self.__COUNT
                 else:
                     self.__findmode = self.__LINENO
+            elif name == "-p":
+                self.__path = value
             elif name == "--rec":
                 self.__recursive = True
             elif name == "--store":
@@ -174,7 +179,12 @@ class WordFinder:
 def main():
     finder = WordFinder()
     finder.PrintUsage()
-    finder.Find(input("input: "))
+    while True:
+        line = input("input: ")
+        if line == "exit" or line == "q":
+            break;
+        finder.Find(line)
+        os.system("pause")
 
 if __name__ == "__main__":
     main()
