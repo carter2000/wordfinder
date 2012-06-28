@@ -184,7 +184,7 @@ def main():
         if line == "exit" or line == "q":
             break;
         finder.Find(line)
-        os.system("pause")
+    os.system("pause")
 
 if __name__ == "__main__":
     main()
