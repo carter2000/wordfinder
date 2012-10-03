@@ -30,7 +30,7 @@ class WordFinder:
                 return
 
         if not os.path.exists(self.__path):
-            print("'" + path + "'" + " is not exists!")
+            print("'" + self.__path + "'" + " is not exists!")
             return
         print(os.path.abspath(self.__path))
         path = os.path.normpath(os.path.abspath(self.__path))
@@ -140,6 +140,7 @@ class WordFinder:
         try:
             options, _ = getopt.getopt(args, "p:m", ["rec", "store", "case", "full", "suffixs="])
         except:
+            print("unknown option")
             return False
         for name, value in options:
             if name == "-m":
