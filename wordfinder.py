@@ -3,6 +3,7 @@ import codecs
 import getopt
 import io
 import os
+import sys
 
 class WordFinder:
     def __init__(self):
@@ -25,7 +26,8 @@ class WordFinder:
         else:
             word = line[0 : optionstart - 1]
             args = line[optionstart : ].split()
-            self.__ParseOptions(args)
+            if not self.__ParseOptions(args):
+                return
 
         if not os.path.exists(self.__path):
             print("'" + path + "'" + " is not exists!")
@@ -135,7 +137,10 @@ class WordFinder:
         print("    --suffixs: specified the target files's suffixs, such as 'c,cpp,xml'")
 
     def __ParseOptions(self, args):
-        options, _ = getopt.getopt(args, "p:m", ["rec", "store", "case", "full", "suffixs="])
+        try:
+            options, _ = getopt.getopt(args, "p:m", ["rec", "store", "case", "full", "suffixs="])
+        except:
+            return False
         for name, value in options:
             if name == "-m":
                 if value == "1":
@@ -156,6 +161,7 @@ class WordFinder:
                 self.__fullword = True
             elif name == "--suffixs":
                 self.__SetSuffixs(value)
+        return True
 
     def __CountWord(self, line, word):
         if not self.__casesensitive:
@@ -180,11 +186,13 @@ def main():
     finder = WordFinder()
     finder.PrintUsage()
     while True:
-        line = input("input: ")
+        try:
+            line = input("input: ")
+        except:
+            sys.exit()
         if line == "exit" or line == "q":
             break;
         finder.Find(line)
-    os.system("pause")
 
 if __name__ == "__main__":
     main()
